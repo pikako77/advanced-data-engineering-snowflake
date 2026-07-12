@@ -3,12 +3,12 @@ USE DATABASE staging_tasty_bytes;
 USE SCHEMA public;
 
 -- Create an email integration 
-
-TYPE = 
+CREATE OR REPLACE NOTIFICATION INTEGRATION email_notification_int
+TYPE = EMAIL
 ENABLED = TRUE
-ALLOWED_RECIPIENTS = ('ADD EMAIL ADDRESS');  -- Update the recipient's email here
+ALLOWED_RECIPIENTS = ('	mitsukotestagent@gmail.com');  -- Update the recipient's email here
 
-CREATE OR REPLACE PROCEDURE
+CREATE OR REPLACE PROCEDURE staging_tasty_bytes.raw_pos.notify_data_quality_team()
 RETURNS STRING
 LANGUAGE PYTHON
 RUNTIME_VERSION = '3.10'
@@ -112,9 +112,9 @@ def notify_data_quality_team(session: Session) -> str:
     """
     
     # Send the email:
-    session.call("",
-                 "",
-                 "ADD EMAIL ADDRESS",
+    session.call("SYSTEM$SEND_EMAIL",
+                 "EMAIL_NOTIFICATION_INT",
+                 "	mitsukotestagent@gmail.com",
                  f"ALERT: {record_count} orders with NULL values detected",
                  email_content,
                  "text/html")
